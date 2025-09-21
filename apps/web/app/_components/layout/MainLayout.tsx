@@ -100,6 +100,7 @@ export default function MainLayout() {
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
+  const [menuItemQuantities, setMenuItemQuantities] = useState<Record<string, number>>({});
 
   // Helper function to get menu item by ID
   const getMenuItemById = (id: string): MenuItem | undefined => {
@@ -119,6 +120,27 @@ export default function MainLayout() {
     setIsClient(true);
     setCurrentDate(formatVietnameseDate(new Date()));
   }, []);
+
+  // Calculate subtotal and total when order items change
+  useEffect(() => {
+    const subtotal = order.items.reduce((sum, item) => sum + item.total_price, 0);
+    const total = subtotal - order.discount;
+    
+    setOrder(prev => ({
+      ...prev,
+      subtotal,
+      total
+    }));
+  }, [order.items, order.discount]);
+
+  // Sync order items to menu item quantities on mount
+  useEffect(() => {
+    const quantities: Record<string, number> = {};
+    order.items.forEach(item => {
+      quantities[item.menu_item_id] = item.quantity;
+    });
+    setMenuItemQuantities(quantities);
+  }, []); // Only run on mount
 
   // Load data from Supabase on component mount
   useEffect(() => {
@@ -243,6 +265,56 @@ export default function MainLayout() {
     console.log("Add to order:", item);
   };
 
+  const handleMenuItemQuantityChange = (item: MenuItem, quantity: number) => {
+    setMenuItemQuantities(prev => ({
+      ...prev,
+      [item.id]: quantity
+    }));
+
+    // Update order items
+    if (quantity === 0) {
+      // Remove item from order
+      setOrder(prev => ({
+        ...prev,
+        items: prev.items.filter(orderItem => orderItem.menu_item_id !== item.id)
+      }));
+    } else {
+      // Add or update item in order
+      setOrder(prev => {
+        const existingItemIndex = prev.items.findIndex(orderItem => orderItem.menu_item_id === item.id);
+        
+        if (existingItemIndex >= 0) {
+          // Update existing item
+          const updatedItems = [...prev.items];
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity,
+            total_price: item.price * quantity
+          };
+          return {
+            ...prev,
+            items: updatedItems
+          };
+        } else {
+          // Add new item
+          const newOrderItem = {
+            id: `temp_${item.id}_${Date.now()}`, // Temporary ID
+            menu_item_id: item.id,
+            quantity,
+            unit_price: item.price,
+            total_price: item.price * quantity,
+            special_instructions: '',
+            created_at: new Date().toISOString()
+          };
+          return {
+            ...prev,
+            items: [...prev.items, newOrderItem]
+          };
+        }
+      });
+    }
+  };
+
   const handleOrderTypeChange = (type: 'tai-quan' | 'mang-di' | 'giao-hang') => {
     setOrder(prev => ({ ...prev, orderType: type }));
   };
@@ -319,6 +391,8 @@ export default function MainLayout() {
             <MenuGrid 
               items={filteredMenuItems}
               onItemClick={handleMenuItemClick}
+              onQuantityChange={handleMenuItemQuantityChange}
+              itemQuantities={menuItemQuantities}
             />
           )}
         </div>

@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2 } from "lucide-react";
+import { Trash2, Plus, Minus } from "lucide-react";
 import { OrderItem as OrderItemType, MenuItem } from "@go-pos/database";
 import { formatPrice } from "@go-pos/shared";
 
@@ -40,13 +40,29 @@ export default function OrderItem({ item, menuItem, onQuantityChange, onRemove }
         </div>
       </div>
 
-      <Card className="w-8 h-8 bg-[#1f1d2b] rounded-lg border-0 flex-shrink-0">
-        <CardContent className="p-0 flex items-center justify-center h-full">
-          <div className="font-normal text-white text-sm">
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-6 h-6 rounded-full bg-[#1f1d2b] hover:bg-[#2a2f3e] text-white p-0"
+          onClick={() => handleQuantityChange(item.quantity - 1)}
+        >
+          <Minus className="w-3 h-3" />
+        </Button>
+        <div className="w-8 h-8 bg-[#ea7b69] rounded-lg flex items-center justify-center">
+          <div className="font-medium text-white text-sm">
             {item.quantity}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-6 h-6 rounded-full bg-[#1f1d2b] hover:bg-[#2a2f3e] text-white p-0"
+          onClick={() => handleQuantityChange(item.quantity + 1)}
+        >
+          <Plus className="w-3 h-3" />
+        </Button>
+      </div>
 
       <div className="w-16 font-medium text-[#ea7b69] text-sm text-right flex-shrink-0">
         {formatPrice(item.total_price)}
