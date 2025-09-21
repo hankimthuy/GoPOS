@@ -2,16 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
-import { OrderItem as OrderItemType } from "@go-pos/database";
+import { OrderItem as OrderItemType, MenuItem } from "@go-pos/database";
 import { formatPrice } from "@go-pos/shared";
 
 interface OrderItemProps {
   item: OrderItemType;
+  menuItem?: MenuItem;
   onQuantityChange: (itemId: string, quantity: number) => void;
   onRemove: (itemId: string) => void;
 }
 
-export default function OrderItem({ item, onQuantityChange, onRemove }: OrderItemProps) {
+export default function OrderItem({ item, menuItem, onQuantityChange, onRemove }: OrderItemProps) {
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0) {
       onQuantityChange(item.id, newQuantity);
@@ -26,15 +27,15 @@ export default function OrderItem({ item, onQuantityChange, onRemove }: OrderIte
         <div
           className="w-12 h-12 rounded-lg bg-cover bg-center flex-shrink-0 bg-gray-600"
           style={{ 
-            backgroundImage: item.menu_item?.image_url ? `url(${item.menu_item.image_url})` : 'none' 
+            backgroundImage: menuItem?.image_url ? `url(${menuItem.image_url})` : 'none' 
           }}
         />
         <div className="flex flex-col min-w-0 flex-1">
           <div className="font-medium text-white text-sm truncate">
-            {item.menu_item?.name || 'Unknown Item'}
+            {menuItem?.name || 'Unknown Item'}
           </div>
           <div className="font-normal text-gray-400 text-xs truncate">
-            {item.special_instructions || item.menu_item?.description || ''}
+            {item.special_instructions || menuItem?.description || ''}
           </div>
         </div>
       </div>
