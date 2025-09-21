@@ -39,6 +39,8 @@ describe('MenuItemCard Component', () => {
     jest.clearAllMocks()
   })
 
+  // Test: Kiểm tra hiển thị thông tin menu item đúng cách
+  // Mục đích: Đảm bảo tên, giá, số lượng và mô tả được hiển thị chính xác
   it('renders menu item information correctly', () => {
     render(<MenuItemCard {...mockProps} />)
     
@@ -48,6 +50,8 @@ describe('MenuItemCard Component', () => {
     expect(screen.getByText('Cà phê đen truyền thống')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra gọi onClick khi click vào card
+  // Mục đích: Đảm bảo callback function được gọi khi user click vào menu item
   it('calls onClick when card is clicked', () => {
     render(<MenuItemCard {...mockProps} />)
     
@@ -57,6 +61,8 @@ describe('MenuItemCard Component', () => {
     expect(mockProps.onClick).toHaveBeenCalledWith(mockMenuItem)
   })
 
+  // Test: Kiểm tra render hình ảnh khi có image_url
+  // Mục đích: Đảm bảo background image được hiển thị đúng khi có URL
   it('renders image when image_url is provided', () => {
     render(<MenuItemCard {...mockProps} />)
     
@@ -66,6 +72,8 @@ describe('MenuItemCard Component', () => {
     })
   })
 
+  // Test: Kiểm tra render không có hình ảnh khi image_url là null
+  // Mục đích: Đảm bảo fallback styling khi không có hình ảnh
   it('renders without image when image_url is null', () => {
     const propsWithoutImage = {
       item: mockMenuItemWithoutImage,
@@ -80,6 +88,8 @@ describe('MenuItemCard Component', () => {
     })
   })
 
+  // Test: Kiểm tra không render description khi description là null
+  // Mục đích: Đảm bảo description không hiển thị khi data bị thiếu
   it('does not render description when description is null', () => {
     const propsWithoutDescription = {
       item: mockMenuItemWithoutDescription,
@@ -91,6 +101,8 @@ describe('MenuItemCard Component', () => {
     expect(screen.queryByText('Cà phê đen truyền thống')).not.toBeInTheDocument()
   })
 
+  // Test: Kiểm tra hiển thị 'Có sẵn' khi stock_quantity là null
+  // Mục đích: Đảm bảo fallback text khi stock data bị thiếu
   it('shows "Có sẵn" when stock_quantity is null', () => {
     const itemWithoutStock = {
       ...mockMenuItem,
@@ -107,6 +119,8 @@ describe('MenuItemCard Component', () => {
     expect(screen.getByText('Có sẵn')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra hiển thị 'Có sẵn' khi stock_quantity là 0
+  // Mục đích: Đảm bảo hiển thị đúng khi hết hàng
   it('shows "Có sẵn" when stock_quantity is 0', () => {
     const propsOutOfStock = {
       item: mockMenuItemOutOfStock,
@@ -118,6 +132,8 @@ describe('MenuItemCard Component', () => {
     expect(screen.getByText('Có sẵn')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra CSS classes cho styling
+  // Mục đích: Đảm bảo card có styling và hover effects đúng
   it('applies correct CSS classes for styling', () => {
     render(<MenuItemCard {...mockProps} />)
     
@@ -125,12 +141,16 @@ describe('MenuItemCard Component', () => {
     expect(card).toHaveClass('bg-[#242836]', 'border-none', 'rounded-2xl', 'cursor-pointer', 'hover:bg-[#2a2f3e]', 'transition-colors')
   })
 
+  // Test: Kiểm tra format giá đúng cách sử dụng formatPrice utility
+  // Mục đích: Đảm bảo giá được format đúng theo định dạng tiền tệ
   it('formats price correctly using formatPrice utility', () => {
     render(<MenuItemCard {...mockProps} />)
     
     expect(screen.getByText('$25000.00')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra responsive design classes
+  // Mục đích: Đảm bảo text có responsive sizing đúng
   it('applies responsive design classes', () => {
     render(<MenuItemCard {...mockProps} />)
     
@@ -141,6 +161,8 @@ describe('MenuItemCard Component', () => {
     expect(priceElement).toHaveClass('text-sm', 'sm:text-base')
   })
 
+  // Test: Kiểm tra xử lý click events đúng cách
+  // Mục đích: Đảm bảo click handler hoạt động đúng và không bị duplicate calls
   it('handles click events properly', () => {
     render(<MenuItemCard {...mockProps} />)
     

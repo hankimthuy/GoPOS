@@ -50,6 +50,8 @@ describe('MenuGrid Component', () => {
     jest.clearAllMocks()
   })
 
+  // Test: Kiểm tra render tất cả menu items
+  // Mục đích: Đảm bảo tất cả menu items được hiển thị trong grid
   it('renders all menu items', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -58,6 +60,8 @@ describe('MenuGrid Component', () => {
     expect(screen.getByText('Nước ép cam')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra số lượng menu item cards được render
+  // Mục đích: Đảm bảo đúng số lượng items được hiển thị
   it('renders correct number of menu item cards', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -66,6 +70,8 @@ describe('MenuGrid Component', () => {
     expect(menuItemNames).toHaveLength(3)
   })
 
+  // Test: Kiểm tra gọi onItemClick khi click vào menu item
+  // Mục đích: Đảm bảo callback function được gọi đúng khi user click vào item
   it('calls onItemClick when a menu item is clicked', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -75,6 +81,8 @@ describe('MenuGrid Component', () => {
     expect(mockProps.onItemClick).toHaveBeenCalledWith(mockMenuItems[0])
   })
 
+  // Test: Kiểm tra gọi onItemClick với đúng item cho từng menu item
+  // Mục đích: Đảm bảo mỗi item được click sẽ gọi callback với đúng data
   it('calls onItemClick with correct item for each menu item', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -89,6 +97,8 @@ describe('MenuGrid Component', () => {
     expect(mockProps.onItemClick).toHaveBeenCalledWith(mockMenuItems[2])
   })
 
+  // Test: Kiểm tra CSS classes cho grid layout
+  // Mục đích: Đảm bảo grid layout có responsive classes đúng
   it('applies correct CSS classes for grid layout', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -97,6 +107,8 @@ describe('MenuGrid Component', () => {
     expect(gridContainer).toHaveClass('grid', 'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4', 'gap-4', 'sm:gap-6')
   })
 
+  // Test: Kiểm tra CSS classes cho container
+  // Mục đích: Đảm bảo container có styling đúng
   it('applies correct CSS classes for container', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -105,6 +117,8 @@ describe('MenuGrid Component', () => {
     expect(container).toHaveClass('w-full', 'mt-6')
   })
 
+  // Test: Kiểm tra xử lý mảng items rỗng
+  // Mục đích: Đảm bảo component không crash khi không có items
   it('handles empty items array', () => {
     const emptyProps = {
       items: [],
@@ -118,6 +132,8 @@ describe('MenuGrid Component', () => {
     expect(screen.queryByText('Nước ép cam')).not.toBeInTheDocument()
   })
 
+  // Test: Kiểm tra render mỗi item với unique key
+  // Mục đích: Đảm bảo mỗi item được render với key riêng biệt
   it('renders each item with unique key', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -127,6 +143,8 @@ describe('MenuGrid Component', () => {
     expect(screen.getByText('Nước ép cam')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra truyền đúng props cho MenuItemCard components
+  // Mục đích: Đảm bảo mỗi MenuItemCard nhận đúng data từ parent
   it('passes correct props to MenuItemCard components', () => {
     render(<MenuGrid {...mockProps} />)
     
@@ -136,6 +154,8 @@ describe('MenuGrid Component', () => {
     expect(screen.getByText('$20000.00')).toBeInTheDocument() // Nước ép cam price
   })
 
+  // Test: Kiểm tra responsive grid behavior
+  // Mục đích: Đảm bảo grid responsive hoạt động đúng với các breakpoints
   it('maintains responsive grid behavior', () => {
     render(<MenuGrid {...mockProps} />)
     

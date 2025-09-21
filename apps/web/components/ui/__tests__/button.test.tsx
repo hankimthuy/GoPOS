@@ -2,6 +2,8 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { Button } from '../button'
 
 describe('Button Component', () => {
+  // Test: Kiểm tra render với default props
+  // Mục đích: Đảm bảo Button component render đúng với styling mặc định
   it('renders with default props', () => {
     render(<Button>Click me</Button>)
     
@@ -10,6 +12,8 @@ describe('Button Component', () => {
     expect(button).toHaveClass('bg-primary', 'text-primary-foreground', 'hover:bg-primary/90')
   })
 
+  // Test: Kiểm tra render với các variants khác nhau
+  // Mục đích: Đảm bảo Button component hỗ trợ đúng các variant styles
   it('renders with different variants', () => {
     const { rerender } = render(<Button variant="destructive">Delete</Button>)
     expect(screen.getByRole('button')).toHaveClass('bg-destructive', 'text-destructive-foreground', 'hover:bg-destructive/90')
@@ -27,6 +31,8 @@ describe('Button Component', () => {
     expect(screen.getByRole('button')).toHaveClass('text-primary', 'underline-offset-4', 'hover:underline')
   })
 
+  // Test: Kiểm tra render với các sizes khác nhau
+  // Mục đích: Đảm bảo Button component hỗ trợ đúng các size options
   it('renders with different sizes', () => {
     const { rerender } = render(<Button size="sm">Small</Button>)
     expect(screen.getByRole('button')).toHaveClass('h-9', 'rounded-md', 'px-3')
@@ -38,6 +44,8 @@ describe('Button Component', () => {
     expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10')
   })
 
+  // Test: Kiểm tra xử lý click events
+  // Mục đích: Đảm bảo onClick callback được gọi đúng khi user click button
   it('handles click events', () => {
     const handleClick = jest.fn()
     render(<Button onClick={handleClick}>Click me</Button>)
@@ -48,6 +56,8 @@ describe('Button Component', () => {
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
+  // Test: Kiểm tra button có thể bị disable
+  // Mục đích: Đảm bảo disabled state hoạt động đúng với styling phù hợp
   it('can be disabled', () => {
     render(<Button disabled>Disabled</Button>)
     
@@ -56,6 +66,8 @@ describe('Button Component', () => {
     expect(button).toHaveClass('disabled:pointer-events-none', 'disabled:opacity-50')
   })
 
+  // Test: Kiểm tra render như child component khi asChild là true
+  // Mục đích: Đảm bảo Button có thể render như một element khác (như link)
   it('renders as child component when asChild is true', () => {
     render(
       <Button asChild>
@@ -68,6 +80,8 @@ describe('Button Component', () => {
     expect(link).toHaveAttribute('href', '/test')
   })
 
+  // Test: Kiểm tra áp dụng custom className
+  // Mục đích: Đảm bảo custom styling có thể được thêm vào Button component
   it('applies custom className', () => {
     render(<Button className="custom-class">Custom</Button>)
     
@@ -75,6 +89,8 @@ describe('Button Component', () => {
     expect(button).toHaveClass('custom-class')
   })
 
+  // Test: Kiểm tra forward ref đúng cách
+  // Mục đích: Đảm bảo ref được forward đến DOM element đúng
   it('forwards ref correctly', () => {
     const ref = jest.fn()
     render(<Button ref={ref}>Ref Button</Button>)
@@ -82,6 +98,8 @@ describe('Button Component', () => {
     expect(ref).toHaveBeenCalled()
   })
 
+  // Test: Kiểm tra áp dụng base classes đúng
+  // Mục đích: Đảm bảo Button có đầy đủ base styling classes
   it('applies correct base classes', () => {
     render(<Button>Base</Button>)
     
@@ -103,6 +121,8 @@ describe('Button Component', () => {
     )
   })
 
+  // Test: Kiểm tra xử lý keyboard events
+  // Mục đích: Đảm bảo onKeyDown callback hoạt động đúng khi user nhấn phím
   it('handles keyboard events', () => {
     const handleKeyDown = jest.fn()
     render(<Button onKeyDown={handleKeyDown}>Keyboard</Button>)
@@ -113,6 +133,8 @@ describe('Button Component', () => {
     expect(handleKeyDown).toHaveBeenCalledTimes(1)
   })
 
+  // Test: Kiểm tra render với custom props
+  // Mục đích: Đảm bảo các props khác được forward đúng đến DOM element
   it('renders with custom props', () => {
     render(<Button data-testid="custom-button" aria-label="Custom button">Custom</Button>)
     
@@ -121,6 +143,8 @@ describe('Button Component', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom button')
   })
 
+  // Test: Kiểm tra kết hợp variant và size classes đúng cách
+  // Mục đích: Đảm bảo variant và size classes không conflict và hoạt động cùng nhau
   it('combines variant and size classes correctly', () => {
     render(<Button variant="outline" size="lg">Combined</Button>)
     

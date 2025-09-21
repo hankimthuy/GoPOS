@@ -1,13 +1,41 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import CategoryNav from '../CategoryNav'
 
-describe('CategoryNav Component', () => {
-  const mockCategories = [
-    { id: '1', name: 'Cà phê', description: 'Các loại cà phê', is_active: true, active: true },
-    { id: '2', name: 'Trà', description: 'Các loại trà', is_active: true, active: false },
-    { id: '3', name: 'Nước ép', description: 'Các loại nước ép', is_active: true, active: false },
-  ]
+// Mock data cho categories với đầy đủ properties
+const mockCategories = [
+  { 
+    id: '1', 
+    name: 'Cà phê', 
+    description: 'Các loại cà phê', 
+    is_active: true, 
+    active: true,
+    sort_order: 1,
+    created_at: '2023-01-01T00:00:00Z',
+    updated_at: '2023-01-01T00:00:00Z'
+  },
+  { 
+    id: '2', 
+    name: 'Trà', 
+    description: 'Các loại trà', 
+    is_active: true, 
+    active: false,
+    sort_order: 2,
+    created_at: '2023-01-01T00:00:00Z',
+    updated_at: '2023-01-01T00:00:00Z'
+  },
+  { 
+    id: '3', 
+    name: 'Nước ép', 
+    description: 'Các loại nước ép', 
+    is_active: true, 
+    active: false,
+    sort_order: 3,
+    created_at: '2023-01-01T00:00:00Z',
+    updated_at: '2023-01-01T00:00:00Z'
+  },
+]
 
+describe('CategoryNav Component', () => {
   const mockProps = {
     categories: mockCategories,
     onCategoryChange: jest.fn(),
@@ -17,6 +45,8 @@ describe('CategoryNav Component', () => {
     jest.clearAllMocks()
   })
 
+  // Test: Kiểm tra hiển thị tất cả categories
+  // Mục đích: Đảm bảo tất cả categories được render đúng
   it('renders all categories', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -25,6 +55,8 @@ describe('CategoryNav Component', () => {
     expect(screen.getByText('Nước ép')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra style cho category đang active
+  // Mục đích: Đảm bảo category active có style khác biệt
   it('applies active styles to active category', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -32,6 +64,8 @@ describe('CategoryNav Component', () => {
     expect(activeButton).toHaveClass('bg-[#ea7b69]', 'text-white', 'hover:bg-[#ea7b69]/90')
   })
 
+  // Test: Kiểm tra style cho categories không active
+  // Mục đích: Đảm bảo categories inactive có style phù hợp
   it('applies inactive styles to inactive categories', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -39,6 +73,8 @@ describe('CategoryNav Component', () => {
     expect(inactiveButton).toHaveClass('bg-transparent', 'border', 'border-[#e4e7eb]', 'text-[#ea7b69]', 'hover:bg-[#ea7b69]/10')
   })
 
+  // Test: Kiểm tra callback khi click category
+  // Mục đích: Đảm bảo onCategoryChange được gọi với đúng ID
   it('calls onCategoryChange when category is clicked', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -48,6 +84,8 @@ describe('CategoryNav Component', () => {
     expect(mockProps.onCategoryChange).toHaveBeenCalledWith('2')
   })
 
+  // Test: Kiểm tra callback với nhiều categories
+  // Mục đích: Đảm bảo mỗi category gọi callback với ID đúng
   it('calls onCategoryChange with correct category ID for each category', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -61,6 +99,8 @@ describe('CategoryNav Component', () => {
     expect(mockProps.onCategoryChange).toHaveBeenCalledWith('3')
   })
 
+  // Test: Kiểm tra CSS classes responsive
+  // Mục đích: Đảm bảo layout responsive hoạt động đúng
   it('applies correct CSS classes for responsive design', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -68,6 +108,8 @@ describe('CategoryNav Component', () => {
     expect(container).toHaveClass('w-full', 'mt-6', 'flex', 'flex-wrap', 'gap-2', 'sm:gap-3')
   })
 
+  // Test: Kiểm tra xử lý danh sách rỗng
+  // Mục đích: Đảm bảo component không crash khi không có categories
   it('handles empty categories array', () => {
     const emptyProps = {
       categories: [],
@@ -79,6 +121,8 @@ describe('CategoryNav Component', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  // Test: Kiểm tra render categories dưới dạng buttons
+  // Mục đích: Đảm bảo categories được render đúng role
   it('renders categories as buttons', () => {
     render(<CategoryNav {...mockProps} />)
     
@@ -86,6 +130,8 @@ describe('CategoryNav Component', () => {
     expect(buttons).toHaveLength(3)
   })
 
+  // Test: Kiểm tra accessibility của buttons
+  // Mục đích: Đảm bảo tất cả buttons đều enabled và accessible
   it('maintains button accessibility', () => {
     render(<CategoryNav {...mockProps} />)
     

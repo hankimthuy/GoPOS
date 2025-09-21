@@ -1,8 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { Home, Menu, ShoppingCart, Settings } from 'lucide-react'
 import Sidebar from '../Sidebar'
 
-// Mock icons
+// Mock icons để test thay vì dùng icons thật
 const MockHome = () => <div data-testid="home-icon" />
 const MockMenu = () => <div data-testid="menu-icon" />
 const MockCart = () => <div data-testid="cart-icon" />
@@ -25,12 +24,16 @@ describe('Sidebar Component', () => {
     jest.clearAllMocks()
   })
 
+  // Test: Kiểm tra hiển thị avatar với initials
+  // Mục đích: Đảm bảo avatar hiển thị đúng initials "GP"
   it('renders avatar with correct initials', () => {
     render(<Sidebar {...mockProps} />)
     
     expect(screen.getByText('GP')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra hiển thị tất cả navigation items
+  // Mục đích: Đảm bảo tất cả icons navigation được render
   it('renders all navigation items', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -40,6 +43,8 @@ describe('Sidebar Component', () => {
     expect(screen.getByTestId('settings-icon')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra style cho navigation item active
+  // Mục đích: Đảm bảo item active có style khác biệt
   it('applies active styles to active navigation item', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -47,6 +52,8 @@ describe('Sidebar Component', () => {
     expect(homeButton).toHaveClass('bg-[#ea7b69]', 'text-white')
   })
 
+  // Test: Kiểm tra style cho navigation items không active
+  // Mục đích: Đảm bảo items inactive có style phù hợp
   it('applies inactive styles to inactive navigation items', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -54,6 +61,8 @@ describe('Sidebar Component', () => {
     expect(menuButton).toHaveClass('text-gray-400', 'hover:text-white', 'hover:bg-gray-700')
   })
 
+  // Test: Kiểm tra callback khi click navigation item
+  // Mục đích: Đảm bảo onNavigationChange được gọi với đúng index
   it('calls onNavigationChange when navigation item is clicked', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -63,6 +72,8 @@ describe('Sidebar Component', () => {
     expect(mockProps.onNavigationChange).toHaveBeenCalledWith(1)
   })
 
+  // Test: Kiểm tra callback với nhiều navigation items
+  // Mục đích: Đảm bảo mỗi item gọi callback với index đúng
   it('calls onNavigationChange with correct index for each item', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -80,6 +91,8 @@ describe('Sidebar Component', () => {
     expect(mockProps.onNavigationChange).toHaveBeenCalledWith(3)
   })
 
+  // Test: Kiểm tra tooltip titles
+  // Mục đích: Đảm bảo tooltip hiển thị đúng text
   it('renders correct tooltip titles', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -90,6 +103,8 @@ describe('Sidebar Component', () => {
     expect(menuButton).toHaveAttribute('title', 'Menu')
   })
 
+  // Test: Kiểm tra CSS classes cho layout
+  // Mục đích: Đảm bảo sidebar có layout và styling đúng
   it('applies correct CSS classes for layout', () => {
     render(<Sidebar {...mockProps} />)
     
@@ -97,6 +112,8 @@ describe('Sidebar Component', () => {
     expect(sidebar).toHaveClass('w-20', 'min-h-screen', 'flex', 'flex-col', 'gap-6', 'bg-[#242836]')
   })
 
+  // Test: Kiểm tra xử lý danh sách navigation rỗng
+  // Mục đích: Đảm bảo component không crash khi không có navigation items
   it('handles empty navigation items array', () => {
     const emptyProps = {
       navigationItems: [],

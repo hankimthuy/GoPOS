@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import './types/jest.d.ts'
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
