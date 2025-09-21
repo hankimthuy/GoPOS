@@ -17,7 +17,11 @@ export default function OrderTypeToggle({ value, onChange }: OrderTypeToggleProp
     >
       <ToggleGroupItem
         value="tai-quan"
-        className="w-20 sm:w-24 h-8 sm:h-10 bg-[#ea7b69] rounded-full data-[state=on]:bg-[#ea7b69] data-[state=on]:text-white hover:bg-[#ea7b69] border-0"
+        className={`w-20 sm:w-24 h-8 sm:h-10 rounded-full border ${
+          value === 'tai-quan' 
+            ? 'bg-[#ea7b69] text-white border-[#ea7b69]' 
+            : 'border-[#e4e7eb] bg-transparent text-[#ea7b69] hover:bg-[#ea7b69] hover:text-white hover:border-[#ea7b69]'
+        }`}
       >
         <div className="font-medium text-xs sm:text-sm text-center">
           Tại quán
@@ -26,18 +30,26 @@ export default function OrderTypeToggle({ value, onChange }: OrderTypeToggleProp
 
       <ToggleGroupItem
         value="mang-di"
-        className="w-20 sm:w-24 h-8 sm:h-10 rounded-full border border-[#e4e7eb] bg-transparent data-[state=on]:bg-[#ea7b69] data-[state=on]:text-white hover:bg-[#ea7b69] hover:text-white"
+        className={`w-20 sm:w-24 h-8 sm:h-10 rounded-full border ${
+          value === 'mang-di' 
+            ? 'bg-[#ea7b69] text-white border-[#ea7b69]' 
+            : 'border-[#e4e7eb] bg-transparent text-[#ea7b69] hover:bg-[#ea7b69] hover:text-white hover:border-[#ea7b69]'
+        }`}
       >
-        <div className="font-medium text-[#ea7b69] text-xs sm:text-sm text-center">
+        <div className="font-medium text-xs sm:text-sm text-center">
           Mang đi
         </div>
       </ToggleGroupItem>
 
       <ToggleGroupItem
         value="giao-hang"
-        className="w-20 sm:w-24 h-8 sm:h-10 rounded-full border border-[#e4e7eb] bg-transparent data-[state=on]:bg-[#ea7b69] data-[state=on]:text-white hover:bg-[#ea7b69] hover:text-white"
+        className={`w-20 sm:w-24 h-8 sm:h-10 rounded-full border ${
+          value === 'giao-hang' 
+            ? 'bg-[#ea7b69] text-white border-[#ea7b69]' 
+            : 'border-[#e4e7eb] bg-transparent text-[#ea7b69] hover:bg-[#ea7b69] hover:text-white hover:border-[#ea7b69]'
+        }`}
       >
-        <div className="font-medium text-[#ea7b69] text-xs sm:text-sm text-center">
+        <div className="font-medium text-xs sm:text-sm text-center">
           Giao hàng
         </div>
       </ToggleGroupItem>

@@ -28,6 +28,7 @@ export default function Header({ title, date, onSearch }: HeaderProps) {
             className="flex-1 bg-transparent border-none text-[#a9a9a9] placeholder:text-[#a9a9a9] focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder="Tìm kiếm đồ uống..."
             onChange={(e) => onSearch(e.target.value)}
+            suppressHydrationWarning
           />
         </div>
       </div>
