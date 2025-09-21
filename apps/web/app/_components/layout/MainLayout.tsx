@@ -22,6 +22,41 @@ const navigationIcons = [
   { icon: Settings, isActive: false, label: "Cài đặt" },
 ];
 
+// Demo menu items data - separate from order
+const demoMenuItems: MenuItem[] = [
+  {
+    id: "1",
+    name: "Cà phê sữa",
+    description: "Cà phê sữa đá thơm ngon",
+    base_price: 45000,
+    price: 45000,
+    image_url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop&crop=center",
+    category_id: "1",
+    is_available: true,
+    is_hot_option_available: true,
+    stock_quantity: 50,
+    sort_order: 1,
+    created_at: "2023-11-20T10:00:00.000Z",
+    updated_at: "2023-11-20T10:00:00.000Z"
+  },
+  {
+    id: "2",
+    name: "Cappuccino",
+    description: "Cappuccino Ý đậm đà",
+    base_price: 55000,
+    price: 55000,
+    image_url: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop&crop=center",
+    category_id: "1",
+    is_available: true,
+    is_hot_option_available: true,
+    stock_quantity: 30,
+    sort_order: 2,
+    created_at: "2023-11-20T10:00:00.000Z",
+    updated_at: "2023-11-20T10:00:00.000Z"
+  }
+];
+
+// Clean order data - only order-specific information
 const initialOrder: OrderSummary = {
   orderId: "34562",
   orderType: "tai-quan",
@@ -65,6 +100,15 @@ export default function MainLayout() {
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
+  const [menuItemQuantities, setMenuItemQuantities] = useState<Record<string, number>>({});
+
+  // Helper function to get menu item by ID
+  const getMenuItemById = (id: string): MenuItem | undefined => {
+    // First check demo data, then real data from database
+    const demoItem = demoMenuItems.find(item => item.id === id);
+    if (demoItem) return demoItem;
+    return menuItems.find(item => item.id === id);
+  };
 
   // Format current date to Vietnamese format using date-fns
   const formatVietnameseDate = (date: Date): string => {
@@ -76,6 +120,27 @@ export default function MainLayout() {
     setIsClient(true);
     setCurrentDate(formatVietnameseDate(new Date()));
   }, []);
+
+  // Calculate subtotal and total when order items change
+  useEffect(() => {
+    const subtotal = order.items.reduce((sum, item) => sum + item.total_price, 0);
+    const total = subtotal - order.discount;
+    
+    setOrder(prev => ({
+      ...prev,
+      subtotal,
+      total
+    }));
+  }, [order.items, order.discount]);
+
+  // Sync order items to menu item quantities on mount
+  useEffect(() => {
+    const quantities: Record<string, number> = {};
+    order.items.forEach(item => {
+      quantities[item.menu_item_id] = item.quantity;
+    });
+    setMenuItemQuantities(quantities);
+  }, []); // Only run on mount
 
   // Load data from Supabase on component mount
   useEffect(() => {
@@ -92,13 +157,19 @@ export default function MainLayout() {
         
         setCategories(categoriesData.map(cat => ({ ...cat, active: false })));
         setMenuItems(menuItemsData);
-        setFilteredMenuItems(menuItemsData);
         
-        // Set first category as active
+        // Set first category as active and filter items by that category
         if (categoriesData.length > 0) {
+          const firstCategory = categoriesData[0];
           setCategories(prev => 
             prev.map((cat, index) => ({ ...cat, active: index === 0 }))
           );
+          
+          // Filter menu items by first category
+          const filteredItems = menuItemsData.filter(item => item.category_id === firstCategory.id);
+          setFilteredMenuItems(filteredItems);
+        } else {
+          setFilteredMenuItems(menuItemsData);
         }
       } catch (err) {
         console.error('Error loading data:', err);
@@ -194,6 +265,56 @@ export default function MainLayout() {
     console.log("Add to order:", item);
   };
 
+  const handleMenuItemQuantityChange = (item: MenuItem, quantity: number) => {
+    setMenuItemQuantities(prev => ({
+      ...prev,
+      [item.id]: quantity
+    }));
+
+    // Update order items
+    if (quantity === 0) {
+      // Remove item from order
+      setOrder(prev => ({
+        ...prev,
+        items: prev.items.filter(orderItem => orderItem.menu_item_id !== item.id)
+      }));
+    } else {
+      // Add or update item in order
+      setOrder(prev => {
+        const existingItemIndex = prev.items.findIndex(orderItem => orderItem.menu_item_id === item.id);
+        
+        if (existingItemIndex >= 0) {
+          // Update existing item
+          const updatedItems = [...prev.items];
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity,
+            total_price: item.price * quantity
+          };
+          return {
+            ...prev,
+            items: updatedItems
+          };
+        } else {
+          // Add new item
+          const newOrderItem = {
+            id: `temp_${item.id}_${Date.now()}`, // Temporary ID
+            menu_item_id: item.id,
+            quantity,
+            unit_price: item.price,
+            total_price: item.price * quantity,
+            special_instructions: '',
+            created_at: new Date().toISOString()
+          };
+          return {
+            ...prev,
+            items: [...prev.items, newOrderItem]
+          };
+        }
+      });
+    }
+  };
+
   const handleOrderTypeChange = (type: 'tai-quan' | 'mang-di' | 'giao-hang') => {
     setOrder(prev => ({ ...prev, orderType: type }));
   };
@@ -239,7 +360,7 @@ export default function MainLayout() {
         <div className="w-full flex flex-col px-4 lg:px-6">
           <Header 
             title="GoPOS Cafe"
-            date={isClient ? currentDate : '...'}
+            date={isClient ? currentDate : 'Đang tải...'}
             onSearch={handleSearch}
           />
 
@@ -270,6 +391,8 @@ export default function MainLayout() {
             <MenuGrid 
               items={filteredMenuItems}
               onItemClick={handleMenuItemClick}
+              onQuantityChange={handleMenuItemQuantityChange}
+              itemQuantities={menuItemQuantities}
             />
           )}
         </div>
@@ -278,6 +401,7 @@ export default function MainLayout() {
         <div className="w-full lg:w-96 xl:w-[400px] mt-6 lg:mt-0">
           <OrderSummaryComponent
             order={order}
+            getMenuItemById={getMenuItemById}
             onOrderTypeChange={handleOrderTypeChange}
             onItemQuantityChange={handleItemQuantityChange}
             onItemRemove={handleItemRemove}

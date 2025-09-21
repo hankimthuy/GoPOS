@@ -10,8 +10,19 @@ const mockMenuItem = {
   stock_quantity: 10,
   image_url: 'https://example.com/coffee.jpg',
   is_available: true,
+  sort_order: 1,
   created_at: '2023-01-01T00:00:00Z',
   updated_at: '2023-01-01T00:00:00Z',
+  category: {
+    id: '1',
+    name: 'Cà phê',
+    description: 'Các loại cà phê',
+    image_url: null,
+    sort_order: 1,
+    is_active: true,
+    created_at: '2023-01-01T00:00:00Z',
+    updated_at: '2023-01-01T00:00:00Z',
+  }
 }
 
 const mockMenuItemWithoutImage = {
@@ -72,9 +83,9 @@ describe('MenuItemCard Component', () => {
     })
   })
 
-  // Test: Kiểm tra render không có hình ảnh khi image_url là null
-  // Mục đích: Đảm bảo fallback styling khi không có hình ảnh
-  it('renders without image when image_url is null', () => {
+  // Test: Kiểm tra render icon khi không có hình ảnh
+  // Mục đích: Đảm bảo icon được hiển thị khi không có image_url
+  it('renders icon when image_url is null', () => {
     const propsWithoutImage = {
       item: mockMenuItemWithoutImage,
       onClick: jest.fn(),
@@ -82,10 +93,10 @@ describe('MenuItemCard Component', () => {
     
     render(<MenuItemCard {...propsWithoutImage} />)
     
-    const imageElement = screen.getByText('Cà phê đen').closest('div')?.parentElement?.querySelector('div[style*="background-image"]')
-    expect(imageElement).toHaveStyle({
-      backgroundImage: 'none'
-    })
+    // Kiểm tra icon container có gradient background
+    const iconContainer = screen.getByText('Cà phê đen').closest('div')?.parentElement?.querySelector('div[class*="bg-gradient-to-br"]')
+    expect(iconContainer).toBeInTheDocument()
+    expect(iconContainer).toHaveClass('from-[#ea7b69]', 'to-[#d65a4a]')
   })
 
   // Test: Kiểm tra không render description khi description là null
