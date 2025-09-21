@@ -8,8 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +21,17 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+.category-chip-inactive {
+  transition: all 0.2s ease-in-out;
+}
+
+.category-chip-inactive:hover {
+  background-color: #ea7b69 !important;
+  color: white !important;
+  border-color: #ea7b69 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(234, 123, 105, 0.3);
 }
