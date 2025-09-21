@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { OrderSummary as OrderSummaryType } from "@go-pos/database";
+import { OrderSummary as OrderSummaryType, MenuItem } from "@go-pos/database";
 import OrderTypeToggle from "./OrderTypeToggle";
 import OrderItem from "./OrderItem";
 
 interface OrderSummaryProps {
   order: OrderSummaryType;
+  getMenuItemById: (id: string) => MenuItem | undefined;
   onOrderTypeChange: (type: 'tai-quan' | 'mang-di' | 'giao-hang') => void;
   onItemQuantityChange: (itemId: string, quantity: number) => void;
   onItemRemove: (itemId: string) => void;
@@ -13,6 +14,7 @@ interface OrderSummaryProps {
 
 export default function OrderSummary({ 
   order, 
+  getMenuItemById,
   onOrderTypeChange, 
   onItemQuantityChange, 
   onItemRemove, 
@@ -48,6 +50,7 @@ export default function OrderSummary({
           <OrderItem
             key={item.id}
             item={item}
+            menuItem={getMenuItemById(item.menu_item_id)}
             onQuantityChange={onItemQuantityChange}
             onRemove={onItemRemove}
           />
