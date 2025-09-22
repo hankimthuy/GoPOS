@@ -12,7 +12,7 @@ interface OrderItemProps {
   onRemove: (itemId: string) => void;
 }
 
-export default function OrderItem({ item, menuItem, onQuantityChange, onRemove }: OrderItemProps) {
+function OrderItem({ item, menuItem, onQuantityChange, onRemove }: OrderItemProps) {
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0) {
       onQuantityChange(item.id, newQuantity);
@@ -79,3 +79,5 @@ export default function OrderItem({ item, menuItem, onQuantityChange, onRemove }
     </div>
   );
 }
+
+export default OrderItem;

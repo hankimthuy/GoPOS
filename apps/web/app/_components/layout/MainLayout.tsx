@@ -1,6 +1,6 @@
 "use client";
 
-import { Category, categoryQueries, MenuItem, menuItemQueries, OrderSummary } from "@go-pos/database";
+import { Category, categoryQueries, MenuItem, menuItemQueries, OrderSummary, orderQueries } from "@go-pos/database";
 import { CreditCard, Home, Settings, ShoppingBag, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import MenuGrid from "../menu/MenuGrid";
 import SortDropdown, { SortOption } from "../menu/SortDropdown";
 import OrderSummaryComponent from "../order/OrderSummary";
 import Header from "./Header";
+import { ToastContainer, useToast } from "../ui/Toast";
 
 const Sidebar = dynamic(() => import("./Sidebar"), { ssr: false });
 
@@ -58,31 +59,12 @@ const demoMenuItems: MenuItem[] = [
 
 // Clean order data - only order-specific information
 const initialOrder: OrderSummary = {
-  orderId: "34562",
+  orderId: null,
   orderType: "tai-quan",
-  items: [
-    {
-      id: "1",
-      menu_item_id: "1",
-      quantity: 2,
-      unit_price: 45000,
-      total_price: 90000,
-      special_instructions: "Size M, Đá ít",
-      created_at: "2023-11-20T10:00:00.000Z",
-    },
-    {
-      id: "2", 
-      menu_item_id: "2",
-      quantity: 1,
-      unit_price: 55000,
-      total_price: 55000,
-      special_instructions: "Size L",
-      created_at: "2023-11-20T10:00:00.000Z",
-    },
-  ],
+  items: [],
   discount: 0,
-  subtotal: 145000,
-  total: 145000,
+  subtotal: 0,
+  total: 0,
 };
 
 interface CategoryWithActive extends Category {
@@ -101,6 +83,10 @@ export default function MainLayout() {
   const [currentDate, setCurrentDate] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
   const [menuItemQuantities, setMenuItemQuantities] = useState<Record<string, number>>({});
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  
+  // Toast management
+  const { toasts, showSuccess, showError, removeToast } = useToast();
 
   // Helper function to get menu item by ID
   const getMenuItemById = (id: string): MenuItem | undefined => {
@@ -320,24 +306,87 @@ export default function MainLayout() {
   };
 
   const handleItemQuantityChange = (itemId: string, quantity: number) => {
+    // Find the menu item ID from the order item
+    const orderItem = order.items.find(item => item.id === itemId);
+    const menuItemId = orderItem?.menu_item_id;
+    
+    // Update order items
     setOrder(prev => ({
       ...prev,
       items: prev.items.map(item => 
         item.id === itemId ? { ...item, quantity, total_price: item.unit_price * quantity } : item
       )
     }));
+    
+    // Update menu item quantities to sync with order
+    if (menuItemId) {
+      setMenuItemQuantities(prev => ({
+        ...prev,
+        [menuItemId]: quantity
+      }));
+    }
   };
 
   const handleItemRemove = (itemId: string) => {
+    // Find the menu item ID from the order item
+    const orderItem = order.items.find(item => item.id === itemId);
+    const menuItemId = orderItem?.menu_item_id;
+    
+    // Update order items
     setOrder(prev => ({
       ...prev,
       items: prev.items.filter(item => item.id !== itemId)
     }));
+    
+    // Update menu item quantities to sync with order
+    if (menuItemId) {
+      setMenuItemQuantities(prev => ({
+        ...prev,
+        [menuItemId]: 0
+      }));
+    }
   };
 
-  const handleCheckout = () => {
-    // TODO: Implement checkout functionality
-    console.log("Checkout:", order);
+  const handleCheckout = async () => {
+    if (order.items.length === 0) {
+      showError("Lỗi", "Không có món nào trong hóa đơn ");
+      return;
+    }
+
+    if (isProcessingPayment) {
+      return;
+    }
+
+    try {
+      setIsProcessingPayment(true);
+      
+      // Lưu Hóa đơn vào database (order_number sẽ được tạo tự động)
+      const savedOrder = await orderQueries.createOrder(order);
+      
+      // Hiển thị thông báo thành công
+      showSuccess(
+        "Thanh toán thành công!", 
+        `Hóa đơn #${savedOrder.order_number} đã được thanh toán (Tiền mặt) với tổng số tiền ${order.total.toLocaleString('vi-VN')}₫`
+      );
+
+      // Cập nhật orderId với order_number từ database trước khi xóa
+      setOrder(prevOrder => ({
+        ...prevOrder,
+        orderId: savedOrder.order_number
+      }));
+
+      // Delay một chút để user thấy order number, sau đó xóa bảng kê
+      setTimeout(() => {
+        setOrder(initialOrder);
+        setMenuItemQuantities({});
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      showError("Lỗi thanh toán", "Không thể xử lý thanh toán. Vui lòng thử lại.");
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleNavigationChange = (index: number) => {
@@ -347,6 +396,9 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[linear-gradient(0deg,rgba(31,29,43,1)_0%,rgba(31,29,43,1)_100%),linear-gradient(0deg,rgba(255,255,255,1)_0%,rgba(255,255,255,1)_100%)]">
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
+      
       {/* Mobile: Hidden sidebar, Desktop/Tablet: Fixed sidebar */}
       <div className="hidden lg:block">
         <Sidebar 
@@ -406,6 +458,7 @@ export default function MainLayout() {
             onItemQuantityChange={handleItemQuantityChange}
             onItemRemove={handleItemRemove}
             onCheckout={handleCheckout}
+            isProcessingPayment={isProcessingPayment}
           />
         </div>
       </div>

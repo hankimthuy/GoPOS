@@ -21,5 +21,6 @@ export {
   categoryQueries,
   productQueries,
   menuItemQueries, // Alias cho productQueries
-  modifierQueries
+  modifierQueries,
+  orderQueries
 } from './queries';

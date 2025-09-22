@@ -18,11 +18,13 @@ const mockOrder = {
         id: '1',
         name: 'Cà phê đen',
         description: 'Cà phê đen truyền thống',
+        base_price: 25000,
         price: 45000,
         category_id: '1',
         stock_quantity: 10,
         image_url: 'https://example.com/coffee.jpg',
         is_available: true,
+        is_hot_option_available: true,
         sort_order: 1,
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
@@ -40,11 +42,13 @@ const mockOrder = {
         id: '2',
         name: 'Trà sữa',
         description: 'Trà sữa thơm ngon',
+        base_price: 30000,
         price: 55000,
         category_id: '2',
         stock_quantity: 5,
         image_url: 'https://example.com/tea.jpg',
         is_available: true,
+        is_hot_option_available: false,
         sort_order: 2,
         created_at: '2023-01-01T00:00:00Z',
         updated_at: '2023-01-01T00:00:00Z',
@@ -66,6 +70,41 @@ const mockOrderWithDiscount = {
 describe('OrderSummary Component', () => {
   const mockProps = {
     order: mockOrder,
+    getMenuItemById: jest.fn((id: string) => {
+      const menuItems = [
+        {
+          id: '1',
+          name: 'Cà phê đen',
+          description: 'Cà phê đen truyền thống',
+          base_price: 25000,
+          price: 45000,
+          category_id: '1',
+          stock_quantity: 10,
+          image_url: 'https://example.com/coffee.jpg',
+          is_available: true,
+          is_hot_option_available: true,
+          sort_order: 1,
+          created_at: '2023-01-01T00:00:00Z',
+          updated_at: '2023-01-01T00:00:00Z',
+        },
+        {
+          id: '2',
+          name: 'Trà sữa',
+          description: 'Trà sữa thơm ngon',
+          base_price: 30000,
+          price: 55000,
+          category_id: '2',
+          stock_quantity: 5,
+          image_url: 'https://example.com/tea.jpg',
+          is_available: true,
+          is_hot_option_available: false,
+          sort_order: 2,
+          created_at: '2023-01-01T00:00:00Z',
+          updated_at: '2023-01-01T00:00:00Z',
+        },
+      ];
+      return menuItems.find(item => item.id === id);
+    }),
     onOrderTypeChange: jest.fn(),
     onItemQuantityChange: jest.fn(),
     onItemRemove: jest.fn(),
@@ -81,7 +120,7 @@ describe('OrderSummary Component', () => {
   it('renders order ID correctly', () => {
     render(<OrderSummary {...mockProps} />)
     
-    expect(screen.getByText('Đơn hàng #34562')).toBeInTheDocument()
+    expect(screen.getByText('Hóa đơn #34562')).toBeInTheDocument()
   })
 
   // Test: Kiểm tra hiển thị order type toggle
@@ -148,6 +187,62 @@ describe('OrderSummary Component', () => {
     expect(screen.getByText('Tiến hành Thanh toán')).toBeInTheDocument()
   })
 
+  // Test: Kiểm tra hiển thị tổng cộng
+  // Mục đích: Đảm bảo tổng cộng được hiển thị đúng
+  it('renders total amount correctly', () => {
+    render(<OrderSummary {...mockProps} />)
+    
+    expect(screen.getByText('Tổng cộng')).toBeInTheDocument()
+    expect(screen.getByText('145.000₫')).toBeInTheDocument()
+  })
+
+  // Test: Kiểm tra nút thanh toán bị disable khi không có items
+  // Mục đích: Đảm bảo không thể thanh toán khi giỏ hàng trống
+  it('disables checkout button when no items', () => {
+    const emptyOrder = {
+      ...mockOrder,
+      items: [],
+    }
+    
+    const propsWithEmptyOrder = {
+      ...mockProps,
+      order: emptyOrder,
+    }
+    
+    render(<OrderSummary {...propsWithEmptyOrder} />)
+    
+    const checkoutButton = screen.getByText('Tiến hành Thanh toán')
+    expect(checkoutButton.closest('button')).toBeDisabled()
+  })
+
+  // Test: Kiểm tra hiển thị trạng thái đang xử lý thanh toán
+  // Mục đích: Đảm bảo nút hiển thị trạng thái loading khi đang xử lý
+  it('shows processing state when isProcessingPayment is true', () => {
+    const propsWithProcessing = {
+      ...mockProps,
+      isProcessingPayment: true,
+    }
+    
+    render(<OrderSummary {...propsWithProcessing} />)
+    
+    expect(screen.getByText('Đang xử lý...')).toBeInTheDocument()
+    expect(screen.queryByText('Tiến hành Thanh toán')).not.toBeInTheDocument()
+  })
+
+  // Test: Kiểm tra nút thanh toán bị disable khi đang xử lý
+  // Mục đích: Đảm bảo không thể click nhiều lần khi đang xử lý
+  it('disables checkout button when processing payment', () => {
+    const propsWithProcessing = {
+      ...mockProps,
+      isProcessingPayment: true,
+    }
+    
+    render(<OrderSummary {...propsWithProcessing} />)
+    
+    const checkoutButton = screen.getByText('Đang xử lý...')
+    expect(checkoutButton.closest('button')).toBeDisabled()
+  })
+
   // Test: Kiểm tra callback khi click checkout button
   // Mục đích: Đảm bảo onCheckout được gọi khi click nút thanh toán
   it('calls onCheckout when checkout button is clicked', () => {
@@ -188,7 +283,7 @@ describe('OrderSummary Component', () => {
   it('applies correct CSS classes for layout', () => {
     render(<OrderSummary {...mockProps} />)
     
-    const container = screen.getByText('Đơn hàng #34562').closest('div')?.parentElement?.parentElement
+    const container = screen.getByText('Hóa đơn #34562').closest('div')?.parentElement?.parentElement
     expect(container).toHaveClass('w-full', 'lg:w-96', 'xl:w-[400px]', 'min-h-[600px]', 'lg:h-[810px]', 'flex', 'flex-col', 'bg-[#242836]', 'rounded-t-2xl', 'lg:rounded-none')
   })
 
@@ -224,7 +319,7 @@ describe('OrderSummary Component', () => {
     
     render(<OrderSummary {...propsWithEmptyOrder} />)
     
-    expect(screen.getByText('Đơn hàng #34562')).toBeInTheDocument()
+    expect(screen.getByText('Hóa đơn #34562')).toBeInTheDocument()
     expect(screen.getByText('0₫')).toBeInTheDocument()
   })
 
@@ -242,7 +337,7 @@ describe('OrderSummary Component', () => {
   it('maintains proper responsive design classes', () => {
     render(<OrderSummary {...mockProps} />)
     
-    const container = screen.getByText('Đơn hàng #34562').closest('div')?.parentElement?.parentElement
+    const container = screen.getByText('Hóa đơn #34562').closest('div')?.parentElement?.parentElement
     expect(container).toHaveClass('lg:w-96', 'xl:w-[400px]', 'lg:h-[810px]', 'lg:rounded-none')
   })
 })

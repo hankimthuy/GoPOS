@@ -11,8 +11,8 @@ describe('OrderTypeToggle Component', () => {
     jest.clearAllMocks()
   })
 
-  // Test: Kiểm tra render tất cả các tùy chọn loại đơn hàng
-  // Mục đích: Đảm bảo tất cả 3 loại đơn hàng được hiển thị
+  // Test: Kiểm tra render tất cả các tùy chọn loại hóa đơn 
+  // Mục đích: Đảm bảo tất cả 3 loại Hóa đơn được hiển thị
   it('renders all order type options', () => {
     render(<OrderTypeToggle {...mockProps} />)
     
@@ -52,7 +52,7 @@ describe('OrderTypeToggle Component', () => {
     expect(mockProps.onChange).toHaveBeenCalledWith('giao-hang')
   })
 
-  // Test: Kiểm tra xử lý đúng cả 3 loại đơn hàng
+  // Test: Kiểm tra xử lý đúng cả 3 loại hóa đơn 
   // Mục đích: Đảm bảo component hoạt động đúng với tất cả các order types
   it('handles all three order types correctly', () => {
     const { rerender } = render(<OrderTypeToggle {...mockProps} />)

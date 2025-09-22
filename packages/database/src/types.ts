@@ -106,7 +106,7 @@ export interface Order {
 }
 
 export interface OrderSummary {
-  orderId: string;
+  orderId: string | null;
   orderType: 'tai-quan' | 'mang-di' | 'giao-hang';
   items: OrderItem[];
   discount: number;
