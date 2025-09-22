@@ -9,8 +9,5 @@
   },
   "devDependencies": {
     "typescript": "^5"
-  },
-  "scripts": {
-    "build": "tsc"
   }
 }
