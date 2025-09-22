@@ -10,6 +10,7 @@ interface OrderSummaryProps {
   onItemQuantityChange: (itemId: string, quantity: number) => void;
   onItemRemove: (itemId: string) => void;
   onCheckout: () => void;
+  isProcessingPayment?: boolean;
 }
 
 export default function OrderSummary({ 
@@ -18,13 +19,14 @@ export default function OrderSummary({
   onOrderTypeChange, 
   onItemQuantityChange, 
   onItemRemove, 
-  onCheckout 
+  onCheckout,
+  isProcessingPayment = false
 }: OrderSummaryProps) {
   return (
-    <div className="w-full lg:w-96 xl:w-[400px] min-h-[600px] lg:h-[810px] flex flex-col bg-[#242836] rounded-t-2xl lg:rounded-none">
+    <div className="w-full lg:w-96 xl:w-[400px] min-h-[100%] lg:h-[810px] flex flex-col bg-[#242836] rounded-t-2xl lg:rounded-none">
       <div className="px-4 lg:px-6 h-auto mt-6 flex-col gap-4 flex">
         <div className="font-bold text-white text-lg lg:text-xl">
-          Đơn hàng #{order.orderId}
+          Hóa đơn #{order.orderId || 'Tạm tính'}
         </div>
 
         <OrderTypeToggle
@@ -76,12 +78,22 @@ export default function OrderSummary({
           </div>
         </div>
 
+        <div className="w-full mt-3 flex justify-between border-t border-gray-600 pt-3">
+          <div className="font-bold text-white text-lg">
+            Tổng cộng
+          </div>
+          <div className="font-bold text-white text-lg">
+            {order.total.toLocaleString('vi-VN')}₫
+          </div>
+        </div>
+
         <Button 
-          className="w-full h-12 lg:h-14 mt-6 bg-[#ea7b69] rounded-xl hover:bg-[#d66b59]"
+          className="w-full h-12 lg:h-14 mt-6 mb-6 bg-[#ea7b69] rounded-xl hover:bg-[#d66b59] disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={onCheckout}
+          disabled={order.items.length === 0 || isProcessingPayment}
         >
           <div className="font-bold text-white text-sm lg:text-base text-center">
-            Tiến hành Thanh toán
+            {isProcessingPayment ? "Đang xử lý..." : "Tiến hành Thanh toán"}
           </div>
         </Button>
       </div>

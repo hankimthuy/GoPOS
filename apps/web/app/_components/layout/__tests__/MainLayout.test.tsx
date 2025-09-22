@@ -67,7 +67,7 @@ jest.mock('../../order/OrderSummary', () => {
   return function MockOrderSummary({ order, onOrderTypeChange, onItemQuantityChange, onItemRemove, onCheckout }: any) {
     return (
       <div data-testid="order-summary">
-        <div>Đơn hàng #{order.orderId}</div>
+        <div>Hóa đơn #{order.orderId}</div>
         <button onClick={onCheckout}>Tiến hành Thanh toán</button>
       </div>
     )
@@ -228,7 +228,7 @@ describe('MainLayout Component', () => {
       render(<MainLayout />)
     })
 
-    expect(await screen.findByText('Đơn hàng #34562')).toBeInTheDocument()
+    expect(await screen.findByText('Hóa đơn #34562')).toBeInTheDocument()
   })
 
   // Test: Kiểm tra CSS classes responsive

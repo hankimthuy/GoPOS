@@ -14,11 +14,13 @@ const mockOrderItem = {
     id: '1',
     name: 'Cà phê đen',
     description: 'Cà phê đen truyền thống',
+    base_price: 25000,
     price: 25000,
     category_id: '1',
     stock_quantity: 10,
     image_url: 'https://example.com/coffee.jpg',
     is_available: true,
+    is_hot_option_available: false,
     sort_order: 1,
     created_at: '2023-01-01T00:00:00Z',
     updated_at: '2023-01-01T00:00:00Z',
@@ -47,6 +49,7 @@ const mockOrderItemWithoutDescription = {
 describe('OrderItem Component', () => {
   const mockProps = {
     item: mockOrderItem,
+    menuItem: mockOrderItem.menu_item,
     onQuantityChange: jest.fn(),
     onRemove: jest.fn(),
   }
@@ -63,7 +66,7 @@ describe('OrderItem Component', () => {
     expect(screen.getByText('Cà phê đen')).toBeInTheDocument()
     expect(screen.getByText('Size M, Đá ít')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('$50000.00')).toBeInTheDocument()
+    expect(screen.getByText('50.000₫')).toBeInTheDocument()
   })
 
   // Test: Kiểm tra hiển thị hình ảnh khi có image_url
@@ -79,6 +82,7 @@ describe('OrderItem Component', () => {
   it('renders without image when menu item has no image_url', () => {
     const propsWithoutImage = {
       item: mockOrderItemWithoutImage,
+      menuItem: mockOrderItemWithoutImage.menu_item,
       onQuantityChange: jest.fn(),
       onRemove: jest.fn(),
     }
@@ -101,6 +105,7 @@ describe('OrderItem Component', () => {
   it('shows menu item description when no special instructions', () => {
     const propsWithoutSpecialInstructions = {
       item: mockOrderItemWithoutDescription,
+      menuItem: mockOrderItemWithoutDescription.menu_item,
       onQuantityChange: jest.fn(),
       onRemove: jest.fn(),
     }
@@ -120,6 +125,7 @@ describe('OrderItem Component', () => {
     
     const propsWithNullMenuItem = {
       item: itemWithNullMenuItem,
+      menuItem: undefined,
       onQuantityChange: jest.fn(),
       onRemove: jest.fn(),
     }
@@ -145,7 +151,7 @@ describe('OrderItem Component', () => {
   it('formats price correctly using formatPrice utility', () => {
     render(<OrderItem {...mockProps} />)
     
-    expect(screen.getByText('$50000.00')).toBeInTheDocument()
+    expect(screen.getByText('50.000₫')).toBeInTheDocument()
   })
 
   // Test: Kiểm tra CSS classes cho layout
@@ -162,8 +168,8 @@ describe('OrderItem Component', () => {
   it('applies correct CSS classes for quantity display', () => {
     render(<OrderItem {...mockProps} />)
     
-    const quantityCard = screen.getByText('2').closest('div')?.parentElement?.parentElement
-    expect(quantityCard).toHaveClass('w-8', 'h-8', 'bg-[#1f1d2b]', 'rounded-lg', 'border-0', 'flex-shrink-0')
+    const quantityCard = screen.getByText('2').closest('div')
+    expect(quantityCard).toHaveClass('w-8', 'h-8', 'bg-[#ea7b69]', 'rounded-lg', 'flex', 'items-center', 'justify-center')
   })
 
   // Test: Kiểm tra CSS classes cho price display
@@ -171,7 +177,7 @@ describe('OrderItem Component', () => {
   it('applies correct CSS classes for price display', () => {
     render(<OrderItem {...mockProps} />)
     
-    const priceElement = screen.getByText('$50000.00')
+    const priceElement = screen.getByText('50.000₫')
     expect(priceElement).toHaveClass('w-16', 'font-medium', 'text-[#ea7b69]', 'text-sm', 'text-right', 'flex-shrink-0')
   })
 
@@ -202,6 +208,7 @@ describe('OrderItem Component', () => {
     
     const propsWithDifferentQuantity = {
       item: itemWithDifferentQuantity,
+      menuItem: itemWithDifferentQuantity.menu_item,
       onQuantityChange: jest.fn(),
       onRemove: jest.fn(),
     }
