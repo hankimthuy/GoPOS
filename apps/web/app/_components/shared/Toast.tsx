@@ -17,27 +17,31 @@ export interface ToastProps {
 const toastConfig = {
   success: {
     icon: CheckCircle,
-    bgColor: "bg-green-500",
-    textColor: "text-white",
-    borderColor: "border-green-500",
+    bgColor: "bg-[var(--toast-success-bg)]",
+    textColor: "text-[var(--toast-success-text)]",
+    borderColor: "border-[var(--toast-success-border)]",
+    iconColor: "text-[var(--toast-success-icon)]",
   },
   error: {
     icon: XCircle,
-    bgColor: "bg-red-500",
-    textColor: "text-white",
-    borderColor: "border-red-500",
+    bgColor: "bg-[var(--toast-error-bg)]",
+    textColor: "text-[var(--toast-error-text)]",
+    borderColor: "border-[var(--toast-error-border)]",
+    iconColor: "text-[var(--toast-error-icon)]",
   },
   warning: {
     icon: AlertTriangle,
-    bgColor: "bg-yellow-500",
-    textColor: "text-white",
-    borderColor: "border-yellow-500",
+    bgColor: "bg-[var(--toast-warning-bg)]",
+    textColor: "text-[var(--toast-warning-text)]",
+    borderColor: "border-[var(--toast-warning-border)]",
+    iconColor: "text-[var(--toast-warning-icon)]",
   },
   info: {
     icon: Info,
-    bgColor: "bg-blue-500",
-    textColor: "text-white",
-    borderColor: "border-blue-500",
+    bgColor: "bg-[var(--toast-info-bg)]",
+    textColor: "text-[var(--toast-info-text)]",
+    borderColor: "border-[var(--toast-info-border)]",
+    iconColor: "text-[var(--toast-info-icon)]",
   },
 };
 
@@ -56,7 +60,7 @@ export default function Toast({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(() => onClose(id), 300); // Wait for animation to complete
+      setTimeout(() => onClose(id), 300); 
     }, duration);
 
     return () => clearTimeout(timer);
@@ -79,21 +83,21 @@ export default function Toast({
     >
       <div
         className={`
-          ${config.bgColor} ${config.textColor} ${config.borderColor}
+          ${config.bgColor} ${config.borderColor}
           border rounded-lg shadow-lg p-4
           flex items-start gap-3
         `}
       >
-        <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${config.iconColor}`} />
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm">{title}</div>
+          <div className={`font-semibold text-sm ${config.textColor}`}>{title}</div>
           {message && (
-            <div className="text-sm opacity-90 mt-1">{message}</div>
+            <div className={`text-sm mt-1 text-gray-700`}>{message}</div>
           )}
         </div>
         <button
           onClick={handleClose}
-          className="flex-shrink-0 ml-2 hover:opacity-70 transition-opacity"
+          className={`flex-shrink-0 ml-2 hover:opacity-70 transition-opacity ${config.iconColor}`}
         >
           <X className="w-4 h-4" />
         </button>

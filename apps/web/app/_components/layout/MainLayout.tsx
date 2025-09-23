@@ -1,27 +1,18 @@
 "use client";
 
 import { Category, categoryQueries, MenuItem, menuItemQueries, OrderSummary, orderQueries } from "@go-pos/database";
-import { CreditCard, Home, Settings, ShoppingBag, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import CategoryNav from "../menu/CategoryNav";
-import MenuGrid from "../menu/MenuGrid";
-import SortDropdown, { SortOption } from "../menu/SortDropdown";
-import OrderSummaryComponent from "../order/OrderSummary";
 import Header from "./Header";
-import { ToastContainer, useToast } from "../ui/Toast";
+import CategoryNav from "../pages/menu/CategoryNav";
+import SortDropdown, { SortOption } from "../pages/menu/SortDropdown";
+import MenuGrid from "../pages/menu/MenuGrid";
+import OrderSummaryComponent from "../pages/order/OrderSummary";
+import { ToastContainer, useToast } from "../shared/Toast";
 
 const Sidebar = dynamic(() => import("./Sidebar"), { ssr: false });
-
-const navigationIcons = [
-  { icon: Home, isActive: false, label: "Trang chủ" },
-  { icon: User, isActive: true, label: "Người dùng" },
-  { icon: ShoppingBag, isActive: false, label: "Sản phẩm" },
-  { icon: CreditCard, isActive: false, label: "Thanh toán" },
-  { icon: Settings, isActive: false, label: "Cài đặt" },
-];
 
 // Demo menu items data - separate from order
 const demoMenuItems: MenuItem[] = [
@@ -84,6 +75,7 @@ export default function MainLayout() {
   const [isClient, setIsClient] = useState(false);
   const [menuItemQuantities, setMenuItemQuantities] = useState<Record<string, number>>({});
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [currentPage, setCurrentPage] = useState<string>('menu'); 
   
   // Toast management
   const { toasts, showSuccess, showError, removeToast } = useToast();
@@ -390,9 +382,22 @@ export default function MainLayout() {
   };
 
   const handleNavigationChange = (index: number) => {
-    // TODO: Implement navigation functionality
-    console.log("Navigate to:", index);
+    const pages = ['dashboard', 'menu', 'staff', 'inventory', 'reports', 'order', 'reservation'];
+    const newPage = pages[index] || 'menu';
+    setCurrentPage(newPage);
+    console.log("Navigate to:", newPage);
   };
+
+  // Coming Soon Component
+  const ComingSoon = ({ pageName }: { pageName: string }) => (
+    <div className="flex flex-col items-center justify-center h-96 text-center">
+      <div className="text-6xl mb-4">🚧</div>
+      <h2 className="text-2xl font-bold text-white mb-2">Coming Soon</h2>
+      <p className="text-gray-400 text-lg">
+        {pageName.charAt(0).toUpperCase() + pageName.slice(1)} page is under development
+      </p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[linear-gradient(0deg,rgba(31,29,43,1)_0%,rgba(31,29,43,1)_100%),linear-gradient(0deg,rgba(255,255,255,1)_0%,rgba(255,255,255,1)_100%)]">
@@ -402,7 +407,7 @@ export default function MainLayout() {
       {/* Mobile: Hidden sidebar, Desktop/Tablet: Fixed sidebar */}
       <div className="hidden lg:block">
         <Sidebar 
-          navigationItems={navigationIcons}
+          currentPage={currentPage}
           onNavigationChange={handleNavigationChange}
         />
       </div>
@@ -413,54 +418,62 @@ export default function MainLayout() {
           <Header 
             title="GoPOS Cafe"
             date={isClient ? currentDate : 'Đang tải...'}
-            onSearch={handleSearch}
+            onSearch={currentPage === 'menu' ? handleSearch : () => {}}
           />
 
-          <CategoryNav 
-            categories={categories}
-            onCategoryChange={handleCategoryChange}
-          />
+          {currentPage === 'menu' ? (
+            <>
+              <CategoryNav 
+                categories={categories}
+                onCategoryChange={handleCategoryChange}
+              />
 
-          <div className="w-full mt-6 flex justify-between items-center">
-            <div className="font-bold text-white text-lg lg:text-xl">
-              Chọn Món
-            </div>
-            <SortDropdown 
-              value={sortBy}
-              onChange={handleSortChange}
-            />
-          </div>
+              <div className="w-full mt-6 flex justify-between items-center">
+                <div className="font-bold text-white text-lg lg:text-xl">
+                  Chọn Món
+                </div>
+                <SortDropdown 
+                  value={sortBy}
+                  onChange={handleSortChange}
+                />
+              </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-white">Đang tải thực đơn...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-red-400">{error}</div>
-            </div>
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-white">Đang tải thực đơn...</div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-red-400">{error}</div>
+                </div>
+              ) : (
+                <MenuGrid 
+                  items={filteredMenuItems}
+                  onItemClick={handleMenuItemClick}
+                  onQuantityChange={handleMenuItemQuantityChange}
+                  itemQuantities={menuItemQuantities}
+                />
+              )}
+            </>
           ) : (
-            <MenuGrid 
-              items={filteredMenuItems}
-              onItemClick={handleMenuItemClick}
-              onQuantityChange={handleMenuItemQuantityChange}
-              itemQuantities={menuItemQuantities}
-            />
+            <ComingSoon pageName={currentPage} />
           )}
         </div>
 
-        {/* Order Summary - Responsive width */}
-        <div className="w-full lg:w-96 xl:w-[400px] mt-6 lg:mt-0">
-          <OrderSummaryComponent
-            order={order}
-            getMenuItemById={getMenuItemById}
-            onOrderTypeChange={handleOrderTypeChange}
-            onItemQuantityChange={handleItemQuantityChange}
-            onItemRemove={handleItemRemove}
-            onCheckout={handleCheckout}
-            isProcessingPayment={isProcessingPayment}
-          />
-        </div>
+        {/* Order Summary - Only show on menu page */}
+        {currentPage === 'menu' && (
+          <div className="w-full lg:w-96 xl:w-[400px] mt-6 lg:mt-0">
+            <OrderSummaryComponent
+              order={order}
+              getMenuItemById={getMenuItemById}
+              onOrderTypeChange={handleOrderTypeChange}
+              onItemQuantityChange={handleItemQuantityChange}
+              onItemRemove={handleItemRemove}
+              onCheckout={handleCheckout}
+              isProcessingPayment={isProcessingPayment}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

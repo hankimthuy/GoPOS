@@ -3,6 +3,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Toast Colors - Light Theme */
+  --toast-success-bg: #f0f9f0;
+  --toast-success-border: #22c55e;
+  --toast-success-text: #15803d;
+  --toast-success-icon: #22c55e;
+  
+  --toast-error-bg: #fef2f2;
+  --toast-error-border: #ef4444;
+  --toast-error-text: #dc2626;
+  --toast-error-icon: #ef4444;
+  
+  --toast-warning-bg: #fffbeb;
+  --toast-warning-border: #f59e0b;
+  --toast-warning-text: #d97706;
+  --toast-warning-icon: #f59e0b;
+  
+  --toast-info-bg: #eff6ff;
+  --toast-info-border: #3b82f6;
+  --toast-info-text: #2563eb;
+  --toast-info-icon: #3b82f6;
 }
 
 @theme inline {
