@@ -56,7 +56,7 @@ export default function Toast({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(() => onClose(id), 300); // Wait for animation to complete
+      setTimeout(() => onClose(id), 300); 
     }, duration);
 
     return () => clearTimeout(timer);
